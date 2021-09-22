@@ -1,0 +1,28 @@
+# Running this file should generate a simple arch installation on a device with
+# an NVME drive, with a boot partition and a root partition
+
+# username and hostname are mandatory
+username: john-doe
+hostname: archlinux
+
+# user preferences
+editor: vim
+shell: bash
+bootloader: grub
+de: xfce
+
+# you have to configure partitions manually
+partitions:
+  # the key doesn't mean anything; you can put any key you want, as long as it's
+  # valid YAML syntax
+  - boot:
+    format: fat32
+    mount: /boot
+    disk: /dev/nvme0n1 # the device this partition is going to be created on
+    size: 500M # MibiBytes
+  - root:
+    # when there's no `format` property, it's assumed you want `ext4`
+    mount: /
+    disk: /dev/nvme0n1
+    # when there's no `size` property, it's assumed you want the remaining space
+    # on the disk
