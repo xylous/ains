@@ -1,10 +1,13 @@
-use std::io::prelude::*;
 use std::process::{Command, Stdio};
 
-fn exec_cmd(cmd: &str) -> Result<(), std::io::Error> {
-    let args: Vec<&str> = cmd.split_whitespace().collect();
+pub fn install(packages: Vec<&str>) -> Result<(), std::io::Error> {
+    let cmd: Vec<&str> = vec![vec!["pacman", "-S"], packages].into_iter().flatten().collect();
+    exec_cmd(&cmd)?;
+    Ok(())
+}
 
-    Command::new(&args[0])
+fn exec_cmd(args: &Vec<&str>) -> Result<(), std::io::Error> {
+    Command::new(args[0])
         .args(&args[1..])
         .spawn()?;
 
