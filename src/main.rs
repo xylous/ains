@@ -1,39 +1,49 @@
 use clap::{App, Arg};
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-struct InstallOptions {
-    username: Option<String>,
-    hostname: Option<String>,
-    #[serde(default = "default_editor")]
-    editor: String,
-    #[serde(default = "default_shell")]
-    shell: String,
-    #[serde(default = "default_bootloader")]
-    bootloader: String,
-    #[serde(default = "default_partitions")]
-    partitions: Vec<Partition>,
+static mut GLOBAL_VARS: GlobalVars = GlobalVars {
+    partition_number: -1, // we start at -1 since it's going to be incremented every time
+};
+
+pub struct GlobalVars {
+    pub partition_number: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Partition {
+pub struct InstallOptions {
+    pub username: Option<String>,
+    pub hostname: Option<String>,
+    #[serde(default = "default_editor")]
+    pub editor: String,
+    #[serde(default = "default_shell")]
+    pub shell: String,
+    #[serde(default = "default_bootloader")]
+    pub bootloader: String,
+    #[serde(default = "default_partitions")]
+    pub partitions: Vec<Partition>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Partition {
     #[serde(default = "default_partition_format")]
-    format: String,
+    pub format: String,
     #[serde(default = "default_partition_disk")]
-    disk: String,
+    pub disk: String,
     #[serde(default = "default_partition_size")]
-    size: String,
+    pub size: String,
     #[serde(default = "default_partition_mount")]
-    mount: String,
+    pub mount: String,
+    pub number: i32,
 }
 
 impl Partition {
-    fn new(format: String, disk: String, size: String, mount: String) -> Partition {
+    fn new(format: String, disk: String, size: String, mount: String, number: i32) -> Partition {
         Partition {
             format,
             disk,
             size,
             mount,
+            number,
         }
     }
 }
@@ -47,11 +57,13 @@ fn default_partition_size() -> String { "".to_string() }
 fn default_partition_mount() -> String { "".to_string() }
 
 fn default_partitions() -> Vec<Partition> {
+    unsafe {GLOBAL_VARS.partition_number += 1}
     vec![
         Partition::new(default_partition_format(),
                         default_partition_disk(),
                         default_partition_size(),
-                        default_partition_mount()),
+                        default_partition_mount(),
+                        unsafe {GLOBAL_VARS.partition_number}),
     ]
 }
 
