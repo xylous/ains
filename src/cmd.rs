@@ -29,6 +29,19 @@ impl Partition {
             .spawn()?;
         Ok(())
     }
+
+    pub fn disk_partition(&self) -> String {
+        format!("{}p{}", self.disk, self.number)
+    }
+
+    pub fn mount(&self) -> Result<(), std::io::Error> {
+        let mount_args = format!(
+            "mount {} {}",
+            self.mount,
+            self.disk_partition()
+        );
+        exec_cmd(&mount_args.split_whitespace().collect())
+    }
 }
 
 pub fn install(packages: Vec<&str>) -> Result<(), std::io::Error> {
