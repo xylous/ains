@@ -6,13 +6,14 @@ impl Partition {
     pub fn create(&self) -> Result<(), std::io::Error> {
         let echo_args = format!(
             // n: create new partition
-            // next line: default partition number
+            // use partition number specified in instance
             // next line: default first sector
-            // use partition size specified in struct
+            // use partition size specified in instance
             "n\n\
-            \n\
+            {}\n\
             \n\
             {}\n",
+            &self.number,
             &self.size,
         );
 
