@@ -25,9 +25,23 @@ impl Partition {
 
         // now, run fdisk
         Command::new("fdisk")
-            .arg(format!("{}", self.disk))
+            .arg(&self.disk)
             .stdin(echo_cmd.stdout.unwrap())
             .spawn()?;
+
+        // and format the newly created partiton
+        let mut mkfs_cmd: String = String::from("mkfs.");
+        let mut mkfs_args = vec![self.disk_partition()];
+        match self.format.as_str() {
+            "ext4" | "ext3" | "ext2" => mkfs_cmd += &self.format,
+            "fat32" | "fat" => { mkfs_cmd += "fat"; mkfs_args.insert(0, String::from("-F32")) }
+            _ => ()
+        }
+
+        Command::new(mkfs_cmd)
+            .args(mkfs_args)
+            .spawn()?;
+
         Ok(())
     }
 
