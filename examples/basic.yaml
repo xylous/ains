@@ -9,7 +9,7 @@ hostname: archlinux
 editor: vim
 shell: bash
 bootloader: grub
-de: xfce
+de: xfce4
 
 # you have to configure partitions manually
 partitions:
